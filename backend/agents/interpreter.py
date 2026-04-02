@@ -10,8 +10,8 @@ Output: { "entry": "price > sma_50", "exit": "price < sma_50",
 This agent is the "translator" — it bridges the gap between human language
 and machine-executable trading rules.
 
-If OPENAI_API_KEY is set → uses GPT to parse.
-Otherwise              → uses a keyword-matching fallback (works for demos).
+If GEMINI_API_KEY is set → uses Gemini to parse.
+Otherwise             → uses a keyword-matching fallback (works for demos).
 """
 
 import os, re, json
@@ -25,7 +25,7 @@ RULE_TOKENS = [
     "rsi < 40",       "rsi > 60",
 ]
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 def interpret_strategy(text: str) -> dict:
@@ -36,7 +36,7 @@ def interpret_strategy(text: str) -> dict:
     if not text.strip():
         raise ValueError("Strategy text is empty.")
 
-    if OPENAI_API_KEY:
+    if GEMINI_API_KEY:
         result = _interpret_with_llm(text)
     else:
         result = _interpret_with_keywords(text)
@@ -50,21 +50,17 @@ def interpret_strategy(text: str) -> dict:
 # ── LLM path ──────────────────────────────────────────────────────────────
 def _interpret_with_llm(text: str) -> dict:
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        system = f"""You are a trading strategy parser.
-Allowed rule tokens: {', '.join(RULE_TOKENS)}
-Return ONLY raw JSON (no markdown): {{"entry":"...","exit":"...","description":"one sentence"}}
-Default to sma_50 crossover if unclear."""
-        r = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"system","content":system},{"role":"user","content":text}],
-            temperature=0, max_tokens=120,
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        system = f"You are a trading strategy parser. Allowed rule tokens: {', '.join(RULE_TOKENS)}. Return ONLY raw JSON (no markdown): {{\"entry\":\"...\",\"exit\":\"...\",\"description\":\"one sentence\"}}. Default to sma_50 crossover if unclear."
+        r = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=f"{system}\n\nStrategy to parse: {text}",
         )
-        raw = re.sub(r"```json|```","", r.choices[0].message.content).strip()
+        raw = re.sub(r"```json|```","", r.text).strip()
         return json.loads(raw)
     except Exception as e:
-        print(f"[Interpreter] LLM failed ({e}), falling back to keywords")
+        print(f"[Interpreter] Gemini failed ({e}), falling back to keywords")
         return _interpret_with_keywords(text)
 
 

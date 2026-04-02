@@ -29,7 +29,7 @@ Output: {
 
 import os
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 def make_final_decision(
@@ -71,7 +71,7 @@ def make_final_decision(
         confidence = "low"
 
     # ── Generate reasoning ────────────────────────────────────────────────
-    if OPENAI_API_KEY:
+    if GEMINI_API_KEY:
         reasoning = _reason_with_llm(
             chosen, score_orig, score_opt, original_results,
             optimized_results, risk_analysis, market_analysis,
@@ -147,8 +147,8 @@ def _reason_with_llm(
     orig_strat, opt_strat,
 ) -> str:
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
         opt_notes = opt_strat.get("optimization_notes", "")
         prompt = (
             f"You are a trading system's final decision agent. Explain in 3 sentences why "
@@ -162,14 +162,13 @@ def _reason_with_llm(
             f"Optimization changes: {opt_notes}. "
             "Be specific and beginner-friendly."
         )
-        r = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"user","content":prompt}],
-            temperature=0.5, max_tokens=150,
+        r = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt,
         )
-        return r.choices[0].message.content.strip()
+        return r.text.strip()
     except Exception as e:
-        print(f"[Decision Agent] LLM failed ({e})")
+        print(f"[Decision Agent] Gemini failed ({e})")
         return _reason_locally(chosen, s_orig, s_opt, orig_r, opt_r, risk, market)
 
 

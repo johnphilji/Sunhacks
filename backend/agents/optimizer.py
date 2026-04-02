@@ -21,7 +21,7 @@ Strategy improvement rules:
 
 import os
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 def optimize_strategy(
@@ -32,7 +32,7 @@ def optimize_strategy(
 ) -> dict:
     """Main entry for Agent 5."""
 
-    if OPENAI_API_KEY:
+    if GEMINI_API_KEY:
         result = _optimize_with_llm(strategy, backtest_results, market_analysis, risk_analysis)
     else:
         result = _optimize_with_rules(strategy, backtest_results, market_analysis, risk_analysis)
@@ -47,8 +47,8 @@ def optimize_strategy(
 def _optimize_with_llm(strategy, results, market, risk) -> dict:
     try:
         import json, re
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
 
         allowed = [
             "price > sma_20","price < sma_20",
@@ -56,25 +56,16 @@ def _optimize_with_llm(strategy, results, market, risk) -> dict:
             "price > sma_200","price < sma_200",
             "rsi < 30","rsi > 70","rsi < 40","rsi > 60",
         ]
-        system = f"""You are a trading strategy optimizer.
-Allowed rule tokens: {', '.join(allowed)}
-Current strategy: entry={strategy['entry']}, exit={strategy['exit']}
-Backtest: profit={results['profit_pct']:+.1f}%, win_rate={results['win_rate']:.0f}%, trades={results['num_trades']}
-Market: trend={market['trend']}, volatility={market['volatility']}
-Risk: {risk['level']} (score {risk['score']}/10)
+        system = f"You are a trading strategy optimizer. Allowed rule tokens: {', '.join(allowed)}. Current strategy: entry={strategy['entry']}, exit={strategy['exit']}. Backtest: profit={results['profit_pct']:+.1f}%, win_rate={results['win_rate']:.0f}%, trades={results['num_trades']}. Market: trend={market['trend']}, volatility={market['volatility']}. Risk: {risk['level']} (score {risk['score']}/10). Propose an improved strategy. Return ONLY raw JSON (no markdown): {{\"entry\":\"...\",\"exit\":\"...\",\"description\":\"one sentence\",\"optimization_notes\":\"explain what changed and why\"}}"
 
-Propose an improved strategy. Return ONLY raw JSON (no markdown):
-{{"entry":"...","exit":"...","description":"one sentence","optimization_notes":"explain what changed and why"}}"""
-
-        r = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"system","content":system},{"role":"user","content":"Optimize."}],
-            temperature=0.4, max_tokens=180,
+        r = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=system,
         )
-        raw = re.sub(r"```json|```","", r.choices[0].message.content).strip()
+        raw = re.sub(r"```json|```","", r.text).strip()
         return json.loads(raw)
     except Exception as e:
-        print(f"[Optimizer] LLM failed ({e}), using rule-based optimizer")
+        print(f"[Optimizer] Gemini failed ({e}), using rule-based optimizer")
         return _optimize_with_rules(strategy, results, market, risk)
 
 

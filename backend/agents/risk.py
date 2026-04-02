@@ -23,7 +23,7 @@ Risk factors evaluated:
 import os
 import math
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 def assess_risk(backtest_results: dict) -> dict:
@@ -105,7 +105,7 @@ def assess_risk(backtest_results: dict) -> dict:
     }
 
     # ── Generate explanation ──────────────────────────────────────────────
-    if OPENAI_API_KEY:
+    if GEMINI_API_KEY:
         explanation = _explain_with_llm(level, score, flags, metrics)
     else:
         explanation = _explain_locally(level, score, flags)
@@ -122,8 +122,8 @@ def assess_risk(backtest_results: dict) -> dict:
 # ── LLM explanation ────────────────────────────────────────────────────────
 def _explain_with_llm(level, score, flags, metrics) -> str:
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
         prompt = (
             f"Write a 2-sentence beginner-friendly risk assessment. "
             f"Risk level: {level} (score {score}/10). "
@@ -132,14 +132,13 @@ def _explain_with_llm(level, score, flags, metrics) -> str:
             f"win_rate={metrics['win_rate']:.0f}%, trades={metrics['num_trades']}. "
             "Give one practical improvement tip at the end."
         )
-        r = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"user","content":prompt}],
-            temperature=0.6, max_tokens=120,
+        r = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt,
         )
-        return r.choices[0].message.content.strip()
+        return r.text.strip()
     except Exception as e:
-        print(f"[Risk Manager] LLM failed ({e})")
+        print(f"[Risk Manager] Gemini failed ({e})")
         return _explain_locally(level, score, flags)
 
 

@@ -19,7 +19,7 @@ The Decision Agent and Risk Manager consume this output.
 import os
 import math
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 def analyze_market(price_data: list, symbol: str) -> dict:
@@ -82,7 +82,7 @@ def analyze_market(price_data: list, symbol: str) -> dict:
     }
 
     # ── Generate natural-language summary ─────────────────────────────────
-    if OPENAI_API_KEY:
+    if GEMINI_API_KEY:
         summary = _summarize_with_llm(symbol, details)
     else:
         summary = _summarize_locally(symbol, details)
@@ -99,8 +99,8 @@ def analyze_market(price_data: list, symbol: str) -> dict:
 # ── LLM summary ───────────────────────────────────────────────────────────
 def _summarize_with_llm(symbol: str, d: dict) -> str:
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        from google import genai
+        client = genai.Client(api_key=GEMINI_API_KEY)
         prompt = (
             f"Summarize this market analysis for {symbol} in 2 concise sentences for a beginner. "
             f"Data: trend={d['trend']}, volatility={d['volatility']}, "
@@ -108,14 +108,13 @@ def _summarize_with_llm(symbol: str, d: dict) -> str:
             f"pct_from_52wk_high={d['pct_from_high']}%. "
             "Be specific and educational."
         )
-        r = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"user","content":prompt}],
-            temperature=0.6, max_tokens=100,
+        r = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt,
         )
-        return r.choices[0].message.content.strip()
+        return r.text.strip()
     except Exception as e:
-        print(f"[Market Analyst] LLM failed ({e})")
+        print(f"[Market Analyst] Gemini failed ({e})")
         return _summarize_locally(symbol, d)
 
 

@@ -23,6 +23,9 @@ import traceback
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 # ── Import all six agents ──────────────────────────────────────────────────
 from agents.interpreter  import interpret_strategy

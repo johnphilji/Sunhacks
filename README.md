@@ -164,9 +164,8 @@ Returns a single JSON object with all agent outputs:
 
 ## ⚠️ Disclaimer
 
-This is an educational demo project built for hackathons. It is NOT financial advice.
+This is an educational demo project built for Sunhacks hackathon. It is NOT financial advice.
 Never use backtested results to make real trading decisions without extensive additional research.
 
 ---
 
-*Built with ❤️ for hackathon MVP demonstration*

@@ -98,15 +98,21 @@ def run_backtest(strategy: dict, symbol: str, period: str = "1y") -> dict:
     df["rsi"]     = _rsi(df["Close"], 14)
 
     # Drop rows where key indicators are not yet calculated
-    required_sma = 50
-    if "sma_200" in entry_rule or "sma_200" in exit_rule:
-        required_sma = 200
-    elif "sma_20" in entry_rule or "sma_20" in exit_rule:
-        required_sma = 20
-    df = df.dropna(subset=[f"sma_{required_sma}"])
+    # Find the longest window needed across both entry and exit
+    needed = 50
+    for rule in [entry_rule, exit_rule]:
+        if "sma_200" in rule: needed = 200; break
+        elif "sma_50" in rule: needed = max(needed, 50)
+        elif "sma_20" in rule: needed = max(needed, 20)
 
-    if len(df) < 10:
-        raise ValueError("Not enough data rows after computing indicators. Try a longer period.")
+    # Ensure we don't drop everything if data is shorter than required window
+    if len(df) <= needed:
+        raise ValueError(f"Insufficient data for {symbol}. Need at least {needed+10} days, but only have {len(df)}.")
+
+    df = df.dropna(subset=[f"sma_{needed}"])
+
+    if len(df) < 5:
+        raise ValueError(f"Not enough clean data rows after computing SMA-{needed}. Try a 2y or 5y period.")
 
     # ── Simulate ──────────────────────────────────────────────────────────
     cash      = 10_000.0

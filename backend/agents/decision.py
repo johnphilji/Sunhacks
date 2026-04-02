@@ -104,34 +104,36 @@ def make_final_decision(
 
 def _score(results: dict, risk: dict) -> float:
     score = 0.0
-
-    # Factor 1: Raw profitability (0-40 pts)
     profit = results["profit_pct"]
-    if profit > 30:   score += 40
+    wr = results["win_rate"]
+    n = results["num_trades"]
+    risk_lv = risk.get("level", "medium")
+    risk_val = risk.get("score", 5)
+
+    # 1. Profitability (0-40 pts)
+    if profit > 40: score += 40
     elif profit > 20: score += 32
-    elif profit > 10: score += 24
-    elif profit > 0:  score += 14
-    elif profit > -10:score += 5
+    elif profit > 5:  score += 18
+    elif profit > 0:  score += 10
     else:             score += 0
 
-    # Factor 2: Win rate (0-30 pts)
-    wr = results["win_rate"]
-    if wr >= 65:   score += 30
-    elif wr >= 55: score += 22
-    elif wr >= 45: score += 14
-    elif wr >= 35: score += 6
-    else:          score += 0
+    # 2. Consistency / Win Rate (0-30 pts)
+    if wr >= 65 and n >= 5:   score += 30
+    elif wr >= 55 and n >= 5: score += 20
+    elif wr >= 45:           score += 10
+    else:                    score += 0
 
-    # Factor 3: Trade count quality (0-15 pts)
-    n = results["num_trades"]
-    if 5 <= n <= 25:    score += 15   # sweet spot
-    elif 3 <= n <= 40:  score += 8
-    elif n > 0:         score += 3
-    else:               score += 0    # no trades = bad
+    # 3. Robustness / Sample Size (0-15 pts)
+    if 10 <= n <= 35:   score += 15
+    elif 5 <= n < 10:   score += 8
+    elif n > 35:        score += 5  # penalized slightly for over-trading
+    else:               score += 0
 
-    # Factor 4: Risk penalty (0 to -20 pts)
-    risk_score = risk.get("score", 5)
-    score -= risk_score * 2   # higher risk = lower final score
+    # 4. Risk Mitigation (0 to -25 pts)
+    # Penalize risk more if win rate is low
+    penalty = risk_val * 2.5
+    if wr < 40: penalty *= 1.2
+    score -= penalty
 
     return max(0.0, score)
 

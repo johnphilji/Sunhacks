@@ -48,13 +48,42 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 1000;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,.08) 2px,
-    rgba(0,0,0,.08) 4px
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  ),
+  linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.06),
+    rgba(0, 255, 0, 0.02),
+    rgba(0, 0, 255, 0.06)
   );
+  background-size: 100% 4px, 3px 100%;
+  opacity: 0.15;
+}
+
+/* CRT Flicker effect */
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.97; }
+  15% { opacity: 0.94; }
+  20% { opacity: 0.98; }
+  25% { opacity: 0.95; }
+  30% { opacity: 0.97; }
+  100% { opacity: 0.96; }
+}
+
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  z-index: 999;
+  pointer-events: none;
+  animation: flicker 0.15s infinite;
 }
 
 /* ── Top bar ────────────────────────────────────────────────── */
@@ -163,6 +192,7 @@ body {
   font-weight: 700;
   letter-spacing: .1em;
   text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(0,255,136,0.3);
 }
 
 .module-id {

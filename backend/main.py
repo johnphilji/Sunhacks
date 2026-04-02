@@ -9,12 +9,12 @@ passing the output of one agent as input to the next.
 Agent Pipeline:
   User Input
     → [1] Interpreter Agent   (NL → structured rules)
-    → [2] Backtest Agent      (initial run)
-    → [3] Market Analyst      (reads the data, gives insight)
-    → [4] Risk Manager        (reads results, gauges risk)
-    → [5] Optimizer Agent     (proposes improved strategy)
+    → [2] Backtest Agent      (initial run: profit, win rate)
+    → [3] Market Analyst      (reads historical data, defines regime)
+    → [4] Risk Manager        (scores risk, flags volatility/drawdown)
+    → [5] Optimizer Agent     (proposes improved strategy via rule-based heuristics)
     → [6] Backtest Agent      (second run with optimized strategy)
-    → [7] Decision Agent      (picks the winner + explains why)
+    → [7] Decision Agent      (picks the winner, scores 0-100, gives reasoning)
     → Final Output to frontend
 """
 
@@ -148,6 +148,11 @@ def run_system(body: SystemInput):
             "market_analysis":    market_analysis,
             "risk_analysis":      risk_analysis,
             "final_decision":     decision,
+            "metadata":           {
+                "symbol": symbol,
+                "period": body.period,
+                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+            }
         }
 
     except ValueError as ve:

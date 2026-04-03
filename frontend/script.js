@@ -11,29 +11,29 @@
 // Automatically use localhost during local development (Live Server or double-clicked file).
 // IMPORTANT: Replace the URL below with your REAL Render.com backend URL once deployed!
 const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
-const API_BASE = isLocal ? "http://localhost:8000" : "https://your-backend-name.onrender.com";
+const API_BASE = isLocal ? "http://localhost:8000" : "https://autotrader-backend-1237.onrender.com";
 
 // ── DOM refs ─────────────────────────────────────────────────────────────
-const runBtn        = document.getElementById("run-btn");
-const runBtnText    = document.getElementById("run-btn-text");
-const errorDisplay  = document.getElementById("error-display");
-const resultsArea   = document.getElementById("results-area");
-const preRun        = document.getElementById("pre-run");
-const sysStatus     = document.getElementById("sys-status");
+const runBtn = document.getElementById("run-btn");
+const runBtnText = document.getElementById("run-btn-text");
+const errorDisplay = document.getElementById("error-display");
+const resultsArea = document.getElementById("results-area");
+const preRun = document.getElementById("pre-run");
+const sysStatus = document.getElementById("sys-status");
 
 // Agent node IDs → mapped to pipeline step order
 const AGENT_NODES = [
-  { id: "ag-interpreter",  label: "INTERPRETER",   delay: 300  },
+  { id: "ag-interpreter", label: "INTERPRETER", delay: 300 },
   { id: "ag-backtester-1", label: "BACKTESTER #1", delay: 1200 },
-  { id: "ag-market",       label: "MARKET ANALYST",delay: 2400 },
-  { id: "ag-risk",         label: "RISK MANAGER",  delay: 3200 },
-  { id: "ag-optimizer",    label: "OPTIMIZER",     delay: 4000 },
+  { id: "ag-market", label: "MARKET ANALYST", delay: 2400 },
+  { id: "ag-risk", label: "RISK MANAGER", delay: 3200 },
+  { id: "ag-optimizer", label: "OPTIMIZER", delay: 4000 },
   { id: "ag-backtester-2", label: "BACKTESTER #2", delay: 4800 },
-  { id: "ag-decision",     label: "DECISION AGENT",delay: 5600 },
+  { id: "ag-decision", label: "DECISION AGENT", delay: 5600 },
 ];
 
 // Track Chart.js instances so we can destroy/recreate them
-let chartOriginal  = null;
+let chartOriginal = null;
 let chartOptimized = null;
 
 // ── Clock ─────────────────────────────────────────────────────────────────
@@ -58,7 +58,7 @@ function resetPipeline() {
     const node = document.getElementById(id);
     node.className = "pipeline-node" + (id === "ag-decision" ? " decision-node" : "");
     node.querySelector(".node-status").textContent = "IDLE";
-    node.querySelector(".node-status").className   = "node-status idle";
+    node.querySelector(".node-status").className = "node-status idle";
   });
 }
 
@@ -70,7 +70,7 @@ function setNodeState(id, state) {
   node.className = `pipeline-node${isDecision ? " decision-node" : ""} ${state}`;
   const statusEl = node.querySelector(".node-status");
   statusEl.textContent = state === "running" ? "ACTIVE" : "DONE ✓";
-  statusEl.className   = `node-status ${state}`;
+  statusEl.className = `node-status ${state}`;
 }
 
 /**
@@ -96,8 +96,8 @@ runBtn.addEventListener("click", runSystem);
 
 async function runSystem() {
   const strategy = document.getElementById("strategy-input").value.trim();
-  const symbol   = document.getElementById("symbol-input").value.trim();
-  const period   = document.getElementById("period-select").value;
+  const symbol = document.getElementById("symbol-input").value.trim();
+  const period = document.getElementById("period-select").value;
 
   if (!strategy) {
     showError("Please enter a trading strategy.");
@@ -105,15 +105,15 @@ async function runSystem() {
   }
 
   // ── UI: loading state ──────────────────────────────────────────────────
-  runBtn.disabled   = true;
+  runBtn.disabled = true;
   runBtnText.textContent = "▶ AGENTS RUNNING…";
   hideError();
   preRun.classList.add("hidden");
   resultsArea.classList.add("hidden");
   resetPipeline();
 
-  sysStatus.textContent  = "● RUNNING";
-  sysStatus.className    = "sys-indicator running";
+  sysStatus.textContent = "● RUNNING";
+  sysStatus.className = "sys-indicator running";
 
   // Start pipeline animation (independent of API timing)
   animatePipeline(() => {
@@ -147,10 +147,10 @@ async function runSystem() {
     resetPipeline();
     preRun.classList.remove("hidden");
   } finally {
-    runBtn.disabled  = false;
+    runBtn.disabled = false;
     runBtnText.textContent = "▶ DEPLOY AGENTS";
-    sysStatus.textContent  = "● STANDBY";
-    sysStatus.className    = "sys-indicator";
+    sysStatus.textContent = "● STANDBY";
+    sysStatus.className = "sys-indicator";
   }
 }
 
@@ -161,11 +161,11 @@ async function runSystem() {
 
 function renderResults(data) {
   const { original_results, optimized_results, market_analysis,
-          risk_analysis, final_decision, original_strategy, optimized_strategy } = data;
+    risk_analysis, final_decision, original_strategy, optimized_strategy } = data;
 
   // ── Metrics row ────────────────────────────────────────────────────────
-  renderMetric("orig-profit",   original_results.profit_pct);
-  renderMetric("opt-profit",    optimized_results.profit_pct);
+  renderMetric("orig-profit", original_results.profit_pct);
+  renderMetric("opt-profit", optimized_results.profit_pct);
   document.getElementById("orig-trades-wr").textContent =
     `${original_results.num_trades} trades · ${original_results.win_rate}% win rate`;
   document.getElementById("opt-trades-wr").textContent =
@@ -174,46 +174,46 @@ function renderResults(data) {
   // Risk
   const riskEl = document.getElementById("risk-level");
   riskEl.textContent = risk_analysis.level.toUpperCase().replace("_", " ");
-  riskEl.className   = `mc-value risk-${risk_analysis.level}`;
+  riskEl.className = `mc-value risk-${risk_analysis.level}`;
   document.getElementById("risk-score").textContent = `Risk score: ${risk_analysis.score}/10`;
 
   // Decision winner
   const winner = final_decision.chosen;
   document.getElementById("winner-label").textContent = winner.toUpperCase();
-  document.getElementById("winner-label").className   = `mc-value ${winner === "optimized" ? "positive" : ""}`;
+  document.getElementById("winner-label").className = `mc-value ${winner === "optimized" ? "positive" : ""}`;
   document.getElementById("winner-confidence").textContent =
     `Confidence: ${final_decision.confidence.toUpperCase()}`;
 
   // ── Strategy rules ─────────────────────────────────────────────────────
   renderRules("orig-rules-box", original_strategy, null);
-  renderRules("opt-rules-box",  optimized_strategy, optimized_strategy.optimization_notes);
+  renderRules("opt-rules-box", optimized_strategy, optimized_strategy.optimization_notes);
 
   // ── Charts ─────────────────────────────────────────────────────────────
-  buildChart("chart-original",  original_results,  "chart-original");
+  buildChart("chart-original", original_results, "chart-original");
   buildChart("chart-optimized", optimized_results, "chart-optimized");
 
   // ── Market Analyst ─────────────────────────────────────────────────────
   const mBadge = document.getElementById("market-badge");
-  mBadge.textContent  = market_analysis.trend.toUpperCase();
-  mBadge.className    = `agent-badge ${market_analysis.trend}`;
+  mBadge.textContent = market_analysis.trend.toUpperCase();
+  mBadge.className = `agent-badge ${market_analysis.trend}`;
   document.getElementById("market-summary").textContent = market_analysis.summary;
 
   const det = market_analysis.details || {};
   document.getElementById("market-stats").innerHTML = `
     <div class="stat-mini"><div class="stat-mini-label">MOMENTUM</div>
-      <div class="stat-mini-val">${(det.momentum_pct||0) > 0 ? "+" : ""}${(det.momentum_pct||0).toFixed(1)}%</div></div>
+      <div class="stat-mini-val">${(det.momentum_pct || 0) > 0 ? "+" : ""}${(det.momentum_pct || 0).toFixed(1)}%</div></div>
     <div class="stat-mini"><div class="stat-mini-label">VOLATILITY</div>
-      <div class="stat-mini-val">${(market_analysis.volatility||"?").toUpperCase()}</div></div>
+      <div class="stat-mini-val">${(market_analysis.volatility || "?").toUpperCase()}</div></div>
     <div class="stat-mini"><div class="stat-mini-label">PERIOD HIGH</div>
-      <div class="stat-mini-val">$${det.period_high||"?"}</div></div>
+      <div class="stat-mini-val">$${det.period_high || "?"}</div></div>
     <div class="stat-mini"><div class="stat-mini-label">AVG DAILY MOVE</div>
-      <div class="stat-mini-val">${det.avg_daily_move||"?"}%</div></div>
+      <div class="stat-mini-val">${det.avg_daily_move || "?"}%</div></div>
   `;
 
   // ── Risk Manager ───────────────────────────────────────────────────────
   const rBadge = document.getElementById("risk-badge");
-  rBadge.textContent = risk_analysis.level.toUpperCase().replace("_"," ");
-  rBadge.className   = `agent-badge ${risk_analysis.level}`;
+  rBadge.textContent = risk_analysis.level.toUpperCase().replace("_", " ");
+  rBadge.className = `agent-badge ${risk_analysis.level}`;
   document.getElementById("risk-explanation").textContent = risk_analysis.explanation;
 
   const flagsEl = document.getElementById("risk-flags");
@@ -227,24 +227,24 @@ function renderResults(data) {
 
   // ── Decision Agent ─────────────────────────────────────────────────────
   const sOrig = final_decision.score_original;
-  const sOpt  = final_decision.score_optimized;
-  const maxS  = Math.max(sOrig, sOpt, 1);
+  const sOpt = final_decision.score_optimized;
+  const maxS = Math.max(sOrig, sOpt, 1);
 
   document.getElementById("score-orig").textContent = `${sOrig}/100`;
-  document.getElementById("score-opt").textContent  = `${sOpt}/100`;
+  document.getElementById("score-opt").textContent = `${sOpt}/100`;
 
   // Animate score bars
   setTimeout(() => {
     const bOrig = document.getElementById("sbar-orig");
-    const bOpt  = document.getElementById("sbar-opt");
+    const bOpt = document.getElementById("sbar-opt");
     bOrig.style.width = `${(sOrig / maxS) * 100}%`;
-    bOpt.style.width  = `${(sOpt  / maxS) * 100}%`;
-    if (winner === "original")  { bOrig.classList.add("winner"); }
-    else                        { bOpt.classList.add("winner");  }
+    bOpt.style.width = `${(sOpt / maxS) * 100}%`;
+    if (winner === "original") { bOrig.classList.add("winner"); }
+    else { bOpt.classList.add("winner"); }
   }, 300);
 
   document.getElementById("decision-reasoning").textContent = final_decision.reasoning;
-  document.getElementById("action-plan").textContent        = final_decision.action_plan;
+  document.getElementById("action-plan").textContent = final_decision.action_plan;
 
   // ── Trade log — show chosen strategy's trades ──────────────────────────
   const chosenResults = winner === "optimized" ? optimized_results : original_results;
@@ -254,7 +254,7 @@ function renderResults(data) {
 
   // ── Show results ───────────────────────────────────────────────────────
   sysStatus.textContent = "● COMPLETE";
-  sysStatus.className   = "sys-indicator done";
+  sysStatus.className = "sys-indicator done";
   resultsArea.classList.remove("hidden");
   resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -267,7 +267,7 @@ function renderResults(data) {
 function renderMetric(id, profitPct) {
   const el = document.getElementById(id);
   el.textContent = `${profitPct >= 0 ? "+" : ""}${profitPct.toFixed(1)}%`;
-  el.className   = `mc-value ${profitPct >= 0 ? "positive" : "negative"}`;
+  el.className = `mc-value ${profitPct >= 0 ? "positive" : "negative"}`;
 }
 
 function renderRules(containerId, strategy, notes) {
@@ -311,15 +311,15 @@ function buildChart(canvasId, results, chartKey) {
   const canvas = document.getElementById(canvasId);
 
   // Destroy existing chart instance to avoid memory leaks
-  if (chartKey === "chart-original"  && chartOriginal)  { chartOriginal.destroy(); }
+  if (chartKey === "chart-original" && chartOriginal) { chartOriginal.destroy(); }
   if (chartKey === "chart-optimized" && chartOptimized) { chartOptimized.destroy(); }
 
-  const labels  = results.price_data.map(d => d.date);
-  const prices  = results.price_data.map(d => d.price);
-  const smaVals = results.sma_data  ? results.sma_data.map(d => d.value) : [];
+  const labels = results.price_data.map(d => d.date);
+  const prices = results.price_data.map(d => d.price);
+  const smaVals = results.sma_data ? results.sma_data.map(d => d.value) : [];
 
   // Buy / Sell point scatter data
-  const buyDates  = new Set(results.buy_signals.map(b => b.date));
+  const buyDates = new Set(results.buy_signals.map(b => b.date));
   const sellDates = new Set(results.sell_signals.map(s => s.date));
 
   const buyPoints = results.price_data
@@ -407,7 +407,7 @@ function buildChart(canvasId, results, chartKey) {
           titleColor: "#00ccff",
           bodyColor: "#c8d8e8",
           titleFont: { family: "Share Tech Mono" },
-          bodyFont:  { family: "Share Tech Mono" },
+          bodyFont: { family: "Share Tech Mono" },
         },
       },
       scales: {
@@ -431,7 +431,7 @@ function buildChart(canvasId, results, chartKey) {
     },
   });
 
-  if (chartKey === "chart-original")  chartOriginal  = instance;
+  if (chartKey === "chart-original") chartOriginal = instance;
   if (chartKey === "chart-optimized") chartOptimized = instance;
 }
 

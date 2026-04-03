@@ -9,9 +9,9 @@
  */
 
 // Automatically use localhost during local development (Live Server or double-clicked file).
-// When hosted fully on Vercel, use an empty string so requests are relative to the domain!
+// IMPORTANT: Replace the URL below with your REAL Render.com backend URL once deployed!
 const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
-const API_BASE = isLocal ? "http://localhost:8000" : "";
+const API_BASE = isLocal ? "http://localhost:8000" : "https://your-backend-name.onrender.com";
 
 // ── DOM refs ─────────────────────────────────────────────────────────────
 const runBtn        = document.getElementById("run-btn");

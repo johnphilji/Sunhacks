@@ -8,7 +8,10 @@
  *   4. Build Chart.js price charts with buy/sell markers
  */
 
-const API_BASE = "http://localhost:8000";
+// Automatically use localhost during local development (Live Server or double-clicked file).
+// When hosted fully on Vercel, use an empty string so requests are relative to the domain!
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
+const API_BASE = isLocal ? "http://localhost:8000" : "";
 
 // ── DOM refs ─────────────────────────────────────────────────────────────
 const runBtn        = document.getElementById("run-btn");

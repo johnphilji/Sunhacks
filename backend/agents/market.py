@@ -109,7 +109,7 @@ def _summarize_with_llm(symbol: str, d: dict) -> str:
             "Be specific and educational."
         )
         r = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
         )
         return r.text.strip()

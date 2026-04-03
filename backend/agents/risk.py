@@ -133,7 +133,7 @@ def _explain_with_llm(level, score, flags, metrics) -> str:
             "Give one practical improvement tip at the end."
         )
         r = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
         )
         return r.text.strip()

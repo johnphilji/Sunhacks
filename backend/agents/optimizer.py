@@ -59,7 +59,7 @@ def _optimize_with_llm(strategy, results, market, risk) -> dict:
         system = f"You are a trading strategy optimizer. Allowed rule tokens: {', '.join(allowed)}. Current strategy: entry={strategy['entry']}, exit={strategy['exit']}. Backtest: profit={results['profit_pct']:+.1f}%, win_rate={results['win_rate']:.0f}%, trades={results['num_trades']}. Market: trend={market['trend']}, volatility={market['volatility']}. Risk: {risk['level']} (score {risk['score']}/10). Propose an improved strategy. Return ONLY raw JSON (no markdown): {{\"entry\":\"...\",\"exit\":\"...\",\"description\":\"one sentence\",\"optimization_notes\":\"explain what changed and why\"}}"
 
         r = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=system,
         )
         raw = re.sub(r"```json|```","", r.text).strip()

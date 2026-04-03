@@ -54,7 +54,7 @@ def _interpret_with_llm(text: str) -> dict:
         client = genai.Client(api_key=GEMINI_API_KEY)
         system = f"You are a trading strategy parser. Allowed rule tokens: {', '.join(RULE_TOKENS)}. Return ONLY raw JSON (no markdown): {{\"entry\":\"...\",\"exit\":\"...\",\"description\":\"one sentence\"}}. Default to sma_50 crossover if unclear."
         r = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=f"{system}\n\nStrategy to parse: {text}",
         )
         raw = re.sub(r"```json|```","", r.text).strip()

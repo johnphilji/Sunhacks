@@ -1,24 +1,10 @@
-"""
-AGENT 2 — Backtesting Agent
-=============================
-Role: Fetches historical stock data and simulates the strategy day-by-day.
 
-Input:  strategy dict + stock symbol + period
-Output: profit_pct, num_trades, win_rate, buy/sell signals, price data
-
-This agent is "stateless" — it can be called multiple times with different
-strategies (original and optimized) and returns comparable result dicts.
-
-Supported indicators: SMA-20, SMA-50, SMA-200, RSI-14
-"""
 
 import yfinance as yf
 import pandas as pd
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  INDICATOR HELPERS
-# ══════════════════════════════════════════════════════════════════════════
+
 
 def _sma(series: pd.Series, window: int) -> pd.Series:
     return series.rolling(window=window).mean()
@@ -31,9 +17,7 @@ def _rsi(series: pd.Series, window: int = 14) -> pd.Series:
     return 100 - (100 / (1 + rs))
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  DATA FETCHING
-# ══════════════════════════════════════════════════════════════════════════
+
 
 def _fetch(symbol: str, period: str) -> pd.DataFrame:
     df = yf.Ticker(symbol).history(period=period)
@@ -44,12 +28,10 @@ def _fetch(symbol: str, period: str) -> pd.DataFrame:
     return df
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  RULE EVALUATOR
-# ══════════════════════════════════════════════════════════════════════════
+
 
 def _eval(rule: str, row: pd.Series) -> bool:
-    """Check if a rule fires for this row. Returns False if data is NaN."""
+
     r = rule.strip().lower().replace(" ", "")
     def safe(col):
         v = row.get(col, float("nan"))
@@ -77,20 +59,14 @@ def _eval(rule: str, row: pd.Series) -> bool:
         return False
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  MAIN BACKTEST FUNCTION
-# ══════════════════════════════════════════════════════════════════════════
+
 
 def run_backtest(strategy: dict, symbol: str, period: str = "1y") -> dict:
-    """
-    Simulates trading $10,000 using the strategy rules day-by-day.
 
-    Returns a result dict consumed by: Risk Manager, Optimizer, Decision Agent.
-    """
     entry_rule = strategy["entry"]
     exit_rule  = strategy["exit"]
 
-    # ── Fetch & enrich data ───────────────────────────────────────────────
+
     df = _fetch(symbol, period)
     df["sma_20"]  = _sma(df["Close"], 20)
     df["sma_50"]  = _sma(df["Close"], 50)
@@ -114,7 +90,7 @@ def run_backtest(strategy: dict, symbol: str, period: str = "1y") -> dict:
     if len(df) < 5:
         raise ValueError(f"Not enough clean data rows after computing SMA-{needed}. Try a 2y or 5y period.")
 
-    # ── Simulate ──────────────────────────────────────────────────────────
+
     cash      = 10_000.0
     shares    = 0.0
     buy_price = 0.0
@@ -147,13 +123,13 @@ def run_backtest(strategy: dict, symbol: str, period: str = "1y") -> dict:
         pct  = (last - buy_price) / buy_price * 100
         trades.append({"buy": round(buy_price,2), "sell": round(last,2), "pct": round(pct,2), "open": True})
 
-    # ── Stats ─────────────────────────────────────────────────────────────
+
     profit_pct = (cash - 10_000) / 10_000 * 100
     n          = len(trades)
     wins       = [t for t in trades if t["pct"] > 0]
     win_rate   = len(wins) / n * 100 if n > 0 else 0.0
 
-    # ── Chart data (last 252 rows for readability) ────────────────────────
+
     view = df.tail(252)
     price_data = [{"date": str(d.date()), "price": round(p, 2)}
                   for d, p in zip(view.index, view["Close"])]

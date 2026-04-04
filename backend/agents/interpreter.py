@@ -1,18 +1,4 @@
-"""
-AGENT 1 — Strategy Interpreter Agent
-======================================
-Role: Converts plain-English trading strategies into structured JSON rules.
 
-Input:  "Buy when price is above the 50-day moving average"
-Output: { "entry": "price > sma_50", "exit": "price < sma_50",
-          "description": "...", "indicators": ["sma_50"] }
-
-This agent is the "translator" — it bridges the gap between human language
-and machine-executable trading rules.
-
-If GEMINI_API_KEY is set → uses Gemini to parse.
-Otherwise             → uses a keyword-matching fallback (works for demos).
-"""
 
 import os, re, json
 
@@ -29,10 +15,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 
 def interpret_strategy(text: str) -> dict:
-    """
-    Main entry point for Agent 1.
-    Returns a dict with keys: entry, exit, description, indicators
-    """
+
     if not text.strip():
         raise ValueError("Strategy text is empty.")
 
@@ -47,7 +30,7 @@ def interpret_strategy(text: str) -> dict:
     return result
 
 
-# ── LLM path ──────────────────────────────────────────────────────────────
+
 def _interpret_with_llm(text: str) -> dict:
     try:
         from google import genai
@@ -64,7 +47,7 @@ def _interpret_with_llm(text: str) -> dict:
         return _interpret_with_keywords(text)
 
 
-# ── Keyword fallback ───────────────────────────────────────────────────────
+
 def _interpret_with_keywords(text: str) -> dict:
     t = text.lower()
 

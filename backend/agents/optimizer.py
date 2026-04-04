@@ -1,23 +1,4 @@
-"""
-AGENT 5 — Optimization Agent
-==============================
-Role: Proposes an improved version of the strategy based on:
-  - Original backtest results (what went wrong)
-  - Market analysis (what the market was doing)
-  - Risk assessment (what risks need mitigation)
 
-Input:  original strategy + results + market + risk analysis
-Output: improved strategy dict (same format as Interpreter output)
-        with an added "optimization_notes" field explaining changes
-
-Strategy improvement rules:
-  - Low win rate + uptrend  → tighten entry (stricter confirmation)
-  - High volatility         → use longer SMA (smoother signal)
-  - Too many trades         → use longer SMA period
-  - RSI strategy + loss     → flip thresholds (try other direction)
-  - SMA strategy + loss     → try different SMA period
-  - Good results            → minor tweak to slightly tighten exits
-"""
 
 import os
 
@@ -43,7 +24,7 @@ def optimize_strategy(
     return result
 
 
-# ── LLM optimization ───────────────────────────────────────────────────────
+
 def _optimize_with_llm(strategy, results, market, risk) -> dict:
     try:
         import json, re
@@ -69,7 +50,7 @@ def _optimize_with_llm(strategy, results, market, risk) -> dict:
         return _optimize_with_rules(strategy, results, market, risk)
 
 
-# ── Rule-based optimizer ───────────────────────────────────────────────────
+
 def _optimize_with_rules(strategy, results, market, risk) -> dict:
     entry   = strategy["entry"]
     exit_r  = strategy["exit"]
@@ -82,7 +63,7 @@ def _optimize_with_rules(strategy, results, market, risk) -> dict:
     notes = []
     new_entry, new_exit = entry, exit_r
 
-    # ── RSI strategy adjustments ───────────────────────────────────────────
+
     if "rsi" in entry:
         if profit < 0 or winrate < 40:
             # Strategy is losing — loosen entry thresholds (wider net)
@@ -104,7 +85,7 @@ def _optimize_with_rules(strategy, results, market, risk) -> dict:
                 new_exit = "rsi > 60"
                 notes.append("Lowered RSI exit threshold to 60 to take profits earlier (risk mitigation)")
 
-    # ── SMA strategy adjustments ───────────────────────────────────────────
+
     else:
         if vol == "high" and "sma_20" in entry:
             # High volatility + short SMA = too much noise → use longer SMA

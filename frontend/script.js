@@ -1,19 +1,11 @@
-/**
- * AutoTrader AI — Multi-Agent System — Frontend Script
- * =====================================================
- * Responsibilities:
- *   1. Animate the agent pipeline in real time (simulated streaming)
- *   2. Call POST /run-system and receive full results
- *   3. Render metrics, strategy rules, charts, risk, market, decision
- *   4. Build Chart.js price charts with buy/sell markers
- */
+
 
 // Automatically use localhost during local development (Live Server or double-clicked file).
 // IMPORTANT: Replace the URL below with your REAL Render.com backend URL once deployed!
 const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
 const API_BASE = isLocal ? "http://localhost:8000" : "https://autotrader-backend-1237.onrender.com";
 
-// ── DOM refs ─────────────────────────────────────────────────────────────
+
 const runBtn = document.getElementById("run-btn");
 const runBtnText = document.getElementById("run-btn-text");
 const errorDisplay = document.getElementById("error-display");
@@ -36,7 +28,7 @@ const AGENT_NODES = [
 let chartOriginal = null;
 let chartOptimized = null;
 
-// ── Clock ─────────────────────────────────────────────────────────────────
+
 function updateClock() {
   document.getElementById("sys-time").textContent =
     new Date().toLocaleTimeString("en-US", { hour12: false });
@@ -44,14 +36,14 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// ── Quick-load example strategies ─────────────────────────────────────────
+
 document.querySelectorAll(".qs-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.getElementById("strategy-input").value = btn.dataset.s;
   });
 });
 
-// ── Pipeline animation helpers ────────────────────────────────────────────
+
 
 function resetPipeline() {
   AGENT_NODES.forEach(({ id }) => {
@@ -90,7 +82,7 @@ function animatePipeline(onComplete) {
   if (onComplete) setTimeout(onComplete, 6400);
 }
 
-// ── MAIN RUN ──────────────────────────────────────────────────────────────
+
 
 runBtn.addEventListener("click", runSystem);
 
@@ -104,7 +96,7 @@ async function runSystem() {
     return;
   }
 
-  // ── UI: loading state ──────────────────────────────────────────────────
+
   runBtn.disabled = true;
   runBtnText.textContent = "▶ AGENTS RUNNING…";
   hideError();
@@ -155,15 +147,13 @@ async function runSystem() {
 }
 
 
-// ══════════════════════════════════════════════════════════════════════════
-//  RENDER RESULTS
-// ══════════════════════════════════════════════════════════════════════════
+
 
 function renderResults(data) {
   const { original_results, optimized_results, market_analysis,
     risk_analysis, final_decision, original_strategy, optimized_strategy } = data;
 
-  // ── Metrics row ────────────────────────────────────────────────────────
+
   renderMetric("orig-profit", original_results.profit_pct);
   renderMetric("opt-profit", optimized_results.profit_pct);
   document.getElementById("orig-trades-wr").textContent =
@@ -184,15 +174,15 @@ function renderResults(data) {
   document.getElementById("winner-confidence").textContent =
     `Confidence: ${final_decision.confidence.toUpperCase()}`;
 
-  // ── Strategy rules ─────────────────────────────────────────────────────
+
   renderRules("orig-rules-box", original_strategy, null);
   renderRules("opt-rules-box", optimized_strategy, optimized_strategy.optimization_notes);
 
-  // ── Charts ─────────────────────────────────────────────────────────────
+
   buildChart("chart-original", original_results, "chart-original");
   buildChart("chart-optimized", optimized_results, "chart-optimized");
 
-  // ── Market Analyst ─────────────────────────────────────────────────────
+
   const mBadge = document.getElementById("market-badge");
   mBadge.textContent = market_analysis.trend.toUpperCase();
   mBadge.className = `agent-badge ${market_analysis.trend}`;
@@ -210,7 +200,7 @@ function renderResults(data) {
       <div class="stat-mini-val">${det.avg_daily_move || "?"}%</div></div>
   `;
 
-  // ── Risk Manager ───────────────────────────────────────────────────────
+
   const rBadge = document.getElementById("risk-badge");
   rBadge.textContent = risk_analysis.level.toUpperCase().replace("_", " ");
   rBadge.className = `agent-badge ${risk_analysis.level}`;
@@ -221,11 +211,11 @@ function renderResults(data) {
     .map(f => `<div class="flag-item">⚠ ${f}</div>`)
     .join("");
 
-  // ── Optimizer notes ────────────────────────────────────────────────────
+
   document.getElementById("optimizer-notes").textContent =
     optimized_strategy.optimization_notes || "No significant changes proposed.";
 
-  // ── Decision Agent ─────────────────────────────────────────────────────
+
   const sOrig = final_decision.score_original;
   const sOpt = final_decision.score_optimized;
   const maxS = Math.max(sOrig, sOpt, 1);
@@ -246,13 +236,13 @@ function renderResults(data) {
   document.getElementById("decision-reasoning").textContent = final_decision.reasoning;
   document.getElementById("action-plan").textContent = final_decision.action_plan;
 
-  // ── Trade log — show chosen strategy's trades ──────────────────────────
+
   const chosenResults = winner === "optimized" ? optimized_results : original_results;
   document.getElementById("trade-log-label").textContent =
     `${winner.toUpperCase()} STRATEGY — ${data.symbol}`;
   buildTradeLog(chosenResults.trades || []);
 
-  // ── Show results ───────────────────────────────────────────────────────
+
   sysStatus.textContent = "● COMPLETE";
   sysStatus.className = "sys-indicator done";
   resultsArea.classList.remove("hidden");
@@ -260,9 +250,7 @@ function renderResults(data) {
 }
 
 
-// ──────────────────────────────────────────────────────────────────────────
-//  HELPERS
-// ──────────────────────────────────────────────────────────────────────────
+
 
 function renderMetric(id, profitPct) {
   const el = document.getElementById(id);
@@ -303,9 +291,7 @@ function buildTradeLog(trades) {
   `).join("");
 }
 
-// ──────────────────────────────────────────────────────────────────────────
-//  CHART BUILDER
-// ──────────────────────────────────────────────────────────────────────────
+
 
 function buildChart(canvasId, results, chartKey) {
   const canvas = document.getElementById(canvasId);
@@ -435,7 +421,7 @@ function buildChart(canvasId, results, chartKey) {
   if (chartKey === "chart-optimized") chartOptimized = instance;
 }
 
-// ── Utility ───────────────────────────────────────────────────────────────
+
 function showError(msg) {
   errorDisplay.textContent = msg;
   errorDisplay.classList.remove("hidden");

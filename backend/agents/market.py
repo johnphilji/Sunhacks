@@ -1,20 +1,4 @@
-"""
-AGENT 3 — Market Analyst Agent
-================================
-Role: Reads raw price data and produces a human-readable market insight.
 
-Input:  price_data list (from Backtester output)
-Output: {
-    "summary":    "Market is in a strong uptrend with moderate volatility",
-    "trend":      "uptrend" | "downtrend" | "sideways",
-    "volatility": "low" | "medium" | "high",
-    "momentum":   float,      # % price change over the period
-    "details":    { ... }     # raw numbers for Decision Agent
-}
-
-This agent doesn't make buy/sell decisions — it just describes the market.
-The Decision Agent and Risk Manager consume this output.
-"""
 
 import os
 import math
@@ -37,7 +21,7 @@ def analyze_market(price_data: list, symbol: str) -> dict:
             "details":    {},
         }
 
-    # ── Quantitative analysis (no AI needed) ─────────────────────────────
+
     prices    = [p["price"] for p in price_data]
     first     = prices[0]
     last      = prices[-1]
@@ -81,7 +65,7 @@ def analyze_market(price_data: list, symbol: str) -> dict:
         "current_price":     last,
     }
 
-    # ── Generate natural-language summary ─────────────────────────────────
+
     if GEMINI_API_KEY:
         summary = _summarize_with_llm(symbol, details)
     else:
@@ -96,7 +80,7 @@ def analyze_market(price_data: list, symbol: str) -> dict:
     }
 
 
-# ── LLM summary ───────────────────────────────────────────────────────────
+
 def _summarize_with_llm(symbol: str, d: dict) -> str:
     try:
         from google import genai
@@ -118,7 +102,7 @@ def _summarize_with_llm(symbol: str, d: dict) -> str:
         return _summarize_locally(symbol, d)
 
 
-# ── Local summary composer ─────────────────────────────────────────────────
+
 def _summarize_locally(symbol: str, d: dict) -> str:
     trend_desc = {
         "uptrend":   f"{symbol} is in a clear uptrend",

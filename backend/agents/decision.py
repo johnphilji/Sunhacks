@@ -1,31 +1,4 @@
-"""
-AGENT 6 — Decision Agent  (THE MOST IMPORTANT AGENT)
-======================================================
-Role: Final arbiter. Compares original vs optimized strategy results,
-      weighs all context (market, risk), and selects the BEST strategy.
 
-This agent demonstrates genuine "agentic" decision-making:
-  - It has access to ALL prior agents' outputs
-  - It applies a multi-factor scoring model
-  - It explains its reasoning in plain English
-  - Its decision can OVERRIDE the "obviously better" choice if risk is too high
-
-Input:
-  original_strategy, original_results
-  optimized_strategy, optimized_results
-  risk_analysis (from Risk Manager)
-  market_analysis (from Market Analyst)
-
-Output: {
-    "chosen":      "original" | "optimized",
-    "confidence":  "low" | "medium" | "high",
-    "score_original":   float,
-    "score_optimized":  float,
-    "reasoning":   "detailed explanation",
-    "final_rules": { entry, exit }
-    "action_plan": "what the user should do next"
-}
-"""
 
 import os
 
@@ -42,11 +15,11 @@ def make_final_decision(
 ) -> dict:
     """Main entry for Agent 6."""
 
-    # ── Multi-factor scoring ──────────────────────────────────────────────
+
     score_orig = _score(original_results,  risk_analysis)
     score_opt  = _score(optimized_results, risk_analysis)
 
-    # ── Choose winner ─────────────────────────────────────────────────────
+
     # If scores are very close (< 5 points), prefer original (less change = less surprise)
     if abs(score_opt - score_orig) < 5:
         chosen = "original"
@@ -61,7 +34,7 @@ def make_final_decision(
         chosen_strategy  = original_strategy
         chosen_results   = original_results
 
-    # ── Confidence level ──────────────────────────────────────────────────
+
     score_gap = abs(score_opt - score_orig)
     if score_gap >= 20:
         confidence = "high"
@@ -70,7 +43,7 @@ def make_final_decision(
     else:
         confidence = "low"
 
-    # ── Generate reasoning ────────────────────────────────────────────────
+
     if GEMINI_API_KEY:
         reasoning = _reason_with_llm(
             chosen, score_orig, score_opt, original_results,
@@ -97,10 +70,7 @@ def make_final_decision(
     }
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  SCORING MODEL
-#  Each factor contributes points. Max possible: ~100.
-# ══════════════════════════════════════════════════════════════════════════
+
 
 def _score(results: dict, risk: dict) -> float:
     score = 0.0
@@ -138,9 +108,7 @@ def _score(results: dict, risk: dict) -> float:
     return max(0.0, score)
 
 
-# ══════════════════════════════════════════════════════════════════════════
-#  REASONING GENERATORS
-# ══════════════════════════════════════════════════════════════════════════
+
 
 def _reason_with_llm(
     chosen, s_orig, s_opt, orig_r, opt_r, risk, market,

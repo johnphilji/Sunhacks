@@ -1,24 +1,4 @@
-"""
-AGENT 4 — Risk Manager Agent
-==============================
-Role: Takes backtest results and produces a structured risk assessment.
 
-Input:  backtest result dict (from Backtesting Agent)
-Output: {
-    "level":       "low" | "medium" | "high" | "very_high",
-    "score":       int 1-10  (10 = maximum risk),
-    "flags":       [list of specific risks detected],
-    "explanation": "plain English paragraph",
-    "metrics":     { raw numbers used in assessment }
-}
-
-Risk factors evaluated:
-  • Profit percentage (negative = high risk)
-  • Win rate (below 40% = concerning)
-  • Trade frequency (too few or too many)
-  • Max drawdown proxy (worst single trade loss)
-  • Consistency (standard deviation of trade returns)
-"""
 
 import os
 import math
@@ -37,7 +17,7 @@ def assess_risk(backtest_results: dict) -> dict:
     flags = []   # specific issues found
     score = 0    # risk score accumulator (0-10)
 
-    # ── Risk factor 1: Profitability ──────────────────────────────────────
+
     if profit < -20:
         score += 3; flags.append("Severe drawdown: strategy lost more than 20%")
     elif profit < 0:
@@ -45,7 +25,7 @@ def assess_risk(backtest_results: dict) -> dict:
     elif profit < 5:
         score += 1; flags.append("Very low returns — may not beat a savings account")
 
-    # ── Risk factor 2: Win rate ───────────────────────────────────────────
+
     if n > 0:
         if winrate < 30:
             score += 3; flags.append(f"Very low win rate ({winrate:.0f}%) — most trades are losers")
@@ -54,7 +34,7 @@ def assess_risk(backtest_results: dict) -> dict:
         elif winrate < 55:
             score += 1; flags.append(f"Marginally acceptable win rate ({winrate:.0f}%)")
 
-    # ── Risk factor 3: Trade frequency ───────────────────────────────────
+
     if n == 0:
         score += 3; flags.append("No trades executed — strategy never triggered")
     elif n > 60:
@@ -62,7 +42,7 @@ def assess_risk(backtest_results: dict) -> dict:
     elif n < 3:
         score += 1; flags.append(f"Too few trades ({n}) — results may not be statistically meaningful")
 
-    # ── Risk factor 4: Worst single-trade loss ────────────────────────────
+
     trade_pcts = [t["pct"] for t in trades]
     if trade_pcts:
         worst = min(trade_pcts)
@@ -71,7 +51,7 @@ def assess_risk(backtest_results: dict) -> dict:
         elif worst < -8:
             score += 1; flags.append(f"Notable single-trade loss: {worst:.1f}%")
 
-        # ── Risk factor 5: Consistency ────────────────────────────────────
+
         if len(trade_pcts) >= 3:
             mean = sum(trade_pcts) / len(trade_pcts)
             variance = sum((x - mean)**2 for x in trade_pcts) / len(trade_pcts)
@@ -84,7 +64,7 @@ def assess_risk(backtest_results: dict) -> dict:
         worst   = 0.0
         std_dev = 0.0
 
-    # ── Map score to level ────────────────────────────────────────────────
+
     score = min(score, 10)
     if score <= 2:
         level = "low"
@@ -104,7 +84,7 @@ def assess_risk(backtest_results: dict) -> dict:
         "risk_score":  score,
     }
 
-    # ── Generate explanation ──────────────────────────────────────────────
+
     if GEMINI_API_KEY:
         explanation = _explain_with_llm(level, score, flags, metrics)
     else:
@@ -119,7 +99,7 @@ def assess_risk(backtest_results: dict) -> dict:
     }
 
 
-# ── LLM explanation ────────────────────────────────────────────────────────
+
 def _explain_with_llm(level, score, flags, metrics) -> str:
     try:
         from google import genai
@@ -142,7 +122,7 @@ def _explain_with_llm(level, score, flags, metrics) -> str:
         return _explain_locally(level, score, flags)
 
 
-# ── Local explanation ──────────────────────────────────────────────────────
+
 def _explain_locally(level: str, score: int, flags: list) -> str:
     intros = {
         "low":       "✅ This strategy shows a healthy risk profile.",

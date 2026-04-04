@@ -1,8 +1,4 @@
-/* ══════════════════════════════════════════════════════════════
-   AutoTrader AI — Multi-Agent System — Stylesheet
-   Aesthetic: Military mission-control terminal
-   Fonts: Share Tech Mono (data/monospace) + Rajdhani (headers)
-   ══════════════════════════════════════════════════════════════ */
+
 
 :root {
   --bg:         #040608;
@@ -42,7 +38,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Scanlines overlay ──────────────────────────────────────── */
+
 .scanlines {
   position: fixed;
   inset: 0;
@@ -86,7 +82,7 @@ body::after {
   animation: flicker 0.15s infinite;
 }
 
-/* ── Top bar ────────────────────────────────────────────────── */
+
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -140,7 +136,7 @@ body::after {
 
 @keyframes blink { 50% { opacity: 0; } }
 
-/* ── Layout ─────────────────────────────────────────────────── */
+
 .layout {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -151,7 +147,7 @@ body::after {
   .layout { grid-template-columns: 1fr; }
 }
 
-/* ── Panels ─────────────────────────────────────────────────── */
+
 .panel { padding: 16px; }
 
 .panel-left {
@@ -174,7 +170,7 @@ body::after {
   background: var(--bg);
 }
 
-/* ── Module card ────────────────────────────────────────────── */
+
 .module {
   border: 1px solid var(--border);
   background: var(--bg2);
@@ -208,7 +204,7 @@ body::after {
 
 .module-body { padding: 12px; }
 
-/* ── Input module ───────────────────────────────────────────── */
+
 .field-label {
   display: block;
   font-size: 10px;
@@ -268,7 +264,7 @@ select option { background: var(--bg3); }
 }
 .qs-btn:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
 
-/* ── Run button ─────────────────────────────────────────────── */
+
 .run-btn {
   width: 100%;
   padding: 11px;
@@ -312,7 +308,7 @@ select option { background: var(--bg3); }
   font-size: 11px;
 }
 
-/* ── Agent Pipeline ─────────────────────────────────────────── */
+
 .pipeline-node {
   display: flex;
   align-items: center;
@@ -373,7 +369,7 @@ select option { background: var(--bg3); }
   margin: 3px 0;
 }
 
-/* ── Pre-run placeholder ─────────────────────────────────────── */
+
 .pre-run-state {
   display: flex;
   flex-direction: column;
@@ -393,7 +389,7 @@ select option { background: var(--bg3); }
 }
 .pre-run-sub { font-size: 11px; color: var(--text-muted); }
 
-/* ── Metrics row ────────────────────────────────────────────── */
+
 .metrics-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -434,7 +430,7 @@ select option { background: var(--bg3); }
 
 .mc-sub { font-size: 11px; color: var(--text-dim); }
 
-/* ── Two col layout ─────────────────────────────────────────── */
+
 .two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -442,7 +438,7 @@ select option { background: var(--bg3); }
 }
 @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
 
-/* ── Rules box ──────────────────────────────────────────────── */
+
 .rules-box {
   font-size: 12px;
   line-height: 2;
@@ -460,7 +456,7 @@ select option { background: var(--bg3); }
 .rule-desc { color: var(--text-dim); font-size: 11px; margin-top: 8px; }
 .opt-notes { color: var(--amber); font-size: 11px; margin-top: 6px; }
 
-/* ── Charts ─────────────────────────────────────────────────── */
+
 .chart-module .module-header { justify-content: space-between; }
 .chart-legend { display: flex; align-items: center; gap: 10px; margin-left: auto; font-size: 10px; color: var(--text-dim); }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 3px; }
@@ -469,7 +465,7 @@ select option { background: var(--bg3); }
 
 .chart-wrap { position: relative; height: 240px; }
 
-/* ── Agent output text ──────────────────────────────────────── */
+
 .agent-badge {
   display: inline-block;
   padding: 3px 12px;
@@ -513,7 +509,7 @@ select option { background: var(--bg3); }
   border-left: 2px solid var(--amber);
 }
 
-/* ── Decision Module ────────────────────────────────────────── */
+
 .decision-module { border-color: var(--cyan); }
 .decision-header { background: rgba(0,204,255,.06); border-bottom-color: var(--cyan); }
 
@@ -579,7 +575,7 @@ select option { background: var(--bg3); }
   border: 1px solid var(--amber);
 }
 
-/* ── Trade table ────────────────────────────────────────────── */
+
 .table-wrap { overflow-x: auto; }
 
 table {
@@ -606,7 +602,7 @@ tr:hover td { background: var(--bg3); }
 td.win  { color: var(--green); }
 td.loss { color: var(--red); }
 
-/* ── Footer ─────────────────────────────────────────────────── */
+
 .footer {
   text-align: center;
   padding: 8px 20px;
@@ -617,5 +613,5 @@ td.loss { color: var(--red); }
   background: var(--bg2);
 }
 
-/* ── Hidden util ────────────────────────────────────────────── */
+
 .hidden { display: none !important; }
